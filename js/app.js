@@ -1,7 +1,8 @@
 // js/app.js
 // Arranque, eventos y navegación. Cada evento modifica `solicitud` y después
 // se llama a render() (a través de las funciones de estado.js).
-import { solicitud, ui, RUTAS, actualizarCampo, marcarTocado, irAPaso, reiniciarSolicitud } from './estado.js';
+import { solicitud, ui, RUTAS, actualizarCampo, marcarTocado, irAPaso, reiniciarSolicitud, restaurarSolicitud } from './estado.js';
+import { leerSolicitud } from './persistencia.js';
 import { render, enfocarPrimerError } from './render.js';
 import { validarPaso, primerPasoInvalido, CAMPOS_POR_PASO } from './validaciones.js';
 import { aNumero, cuotaDelPlan, formatearMoneda, ETIQUETA_ANTIGUEDAD } from './cotizador.js';
@@ -191,6 +192,13 @@ document.addEventListener('focusout', (e) => {
 });
 document.addEventListener('click', alHacerClick);
 document.addEventListener('submit', alEnviar);
+
+// Bonus persistencia: retomar la solicitud donde quedó antes del F5, sin
+// saltear pasos que tengan datos inválidos.
+restaurarSolicitud(leerSolicitud());
+if (solicitud.paso > 1) {
+  solicitud.paso = primerPasoInvalido(solicitud, solicitud.paso - 1) ?? solicitud.paso;
+}
 
 render();
 cargarPlanes();
