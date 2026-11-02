@@ -1,12 +1,37 @@
 // js/app.js
 // Arranque, eventos y navegación. Cada evento modifica `solicitud` y después
 // se llama a render() (a través de las funciones de estado.js).
-import { solicitud, RUTAS, actualizarCampo, marcarTocado, irAPaso, reiniciarSolicitud } from './estado.js';
-import { render } from './render.js';
+import { solicitud, ui, RUTAS, actualizarCampo, marcarTocado, irAPaso, reiniciarSolicitud } from './estado.js';
+import { render, enfocarPrimerError } from './render.js';
+import { validarPaso, CAMPOS_POR_PASO } from './validaciones.js';
+import { aNumero } from './cotizador.js';
+
+// ---------- Planes (data/planes.json) ----------
+let cargaDePlanes = null;
+
+function cargarPlanes() {
+  cargaDePlanes ??= fetch('data/planes.json')
+    .then((respuesta) => {
+      if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+      return respuesta.json();
+    })
+    .then((planes) => {
+      ui.planes = planes;
+      ui.errorPlanes = false;
+    })
+    .catch(() => {
+      // Pasa si se abre index.html con doble click (file://): el paso 2 lo explica.
+      ui.errorPlanes = true;
+      cargaDePlanes = null;
+    })
+    .finally(render);
+  return cargaDePlanes;
+}
 
 // ---------- Lectura de inputs ----------
 function valorDelInput(el) {
   if (el.type === 'checkbox') return el.checked;
+  if (el.name === 'valor') return aNumero(el.value);   // "$ 600.000" → 600000
   return el.value;
 }
 
@@ -34,6 +59,11 @@ const ACCIONES = {
   },
   reintentar: () => irAPaso(4),
   'cambiar-medio': () => irAPaso(4),
+  'recargar-planes': () => {
+    ui.errorPlanes = false;
+    render();
+    cargarPlanes();
+  },
 };
 
 function alHacerClick(evento) {
@@ -50,27 +80,48 @@ function alHacerClick(evento) {
 }
 
 // ---------- Formularios ----------
-const SIGUIENTE = {
-  'form-cotizar': 2,
-  'form-plan': 3,
-  'form-datos': 4,
-  'form-pago': 5,
+// Revalida todo el paso al intentar avanzar. Si hay errores los muestra todos
+// y lleva el foco al primer campo inválido.
+function pasoValido(paso) {
+  const errores = validarPaso(paso, solicitud);
+  if (Object.keys(errores).length === 0) return true;
+  marcarTocado(...Object.keys(CAMPOS_POR_PASO[paso]));
+  enfocarPrimerError(paso);
+  return false;
+}
+
+const AL_ENVIAR = {
+  'form-cotizar': async () => {
+    if (!pasoValido(1)) return;
+    await cargarPlanes();
+    irAPaso(2);
+  },
+  'form-plan': () => irAPaso(3),
+  'form-datos': () => {
+    if (pasoValido(3)) irAPaso(4);
+  },
+  'form-pago': () => {
+    if (pasoValido(4)) irAPaso(5);
+  },
 };
 
 function alEnviar(evento) {
-  const form = evento.target;
-  if (!(form.id in SIGUIENTE)) return;
+  const enviar = AL_ENVIAR[evento.target.id];
+  if (!enviar) return;
   evento.preventDefault();           // sin esto el <form> recarga la página
-  irAPaso(SIGUIENTE[form.id]);
+  enviar();
 }
 
 // ---------- Arranque ----------
+const esOpcion = (el) => el.type === 'radio' || el.type === 'checkbox' || el.tagName === 'SELECT';
+
 document.addEventListener('input', (e) => {
-  if (e.target.type !== 'radio' && e.target.type !== 'checkbox' && e.target.tagName !== 'SELECT') alCambiarCampo(e);
+  if (!esOpcion(e.target)) alCambiarCampo(e);
 });
 document.addEventListener('change', (e) => {
-  if (e.target.type === 'radio' || e.target.type === 'checkbox' || e.target.tagName === 'SELECT') alCambiarCampo(e);
+  if (esOpcion(e.target)) alCambiarCampo(e);
 });
+// Los errores se muestran al salir de cada campo, no mientras se escribe.
 document.addEventListener('focusout', (e) => {
   if (e.target.name in RUTAS) marcarTocado(e.target.name);
 });
@@ -78,3 +129,4 @@ document.addEventListener('click', alHacerClick);
 document.addEventListener('submit', alEnviar);
 
 render();
+cargarPlanes();

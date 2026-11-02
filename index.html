@@ -253,59 +253,37 @@
                 <section>
                   <fieldset>
                     <legend class="sr-only">Planes disponibles</legend>
-                    <div id="lista-planes" class="grid gap-3 lg:grid-cols-3 lg:gap-4">
-                      <label class="plan">
-                        <div class="card">
-                          <header>
-                            <h3 class="plan-nombre">Básico</h3>
-                            <input type="radio" class="input" name="plan" value="basico">
-                          </header>
-                          <section>
-                            <p class="plan-precio"><strong>$ 2.000</strong>/ mes</p>
-                            <ul class="coberturas">
-                              <li><svg aria-hidden="true"><use href="#i-check"/></svg>Robo con violencia</li>
-                              <li data-incluida="false"><svg aria-hidden="true"><use href="#i-x"/></svg>Rotura de pantalla</li>
-                              <li data-incluida="false"><svg aria-hidden="true"><use href="#i-x"/></svg>Hurto / pérdida</li>
-                            </ul>
-                          </section>
-                        </div>
-                      </label>
+                    <div id="lista-planes" class="grid gap-3 lg:grid-cols-3 lg:gap-4"></div>
+                    <p id="planes-cargando" class="py-6 text-center text-sm text-muted-foreground">Cargando planes…</p>
+                    <div id="planes-error" class="alert" data-variant="destructive" hidden>
+                      <svg aria-hidden="true"><use href="#i-alerta"/></svg>
+                      <h2>No pudimos cargar los planes</h2>
+                      <section class="text-xs">
+                        <p>Si abriste el archivo con doble click (file://), usá un servidor local como Live Server o <code>npx serve</code>.</p>
+                        <button type="button" class="btn mt-2" data-variant="outline" data-size="sm" data-accion="recargar-planes">Reintentar</button>
+                      </section>
+                    </div>
+                    <!-- Una card por cada plan de data/planes.json: la clona render.js -->
+                    <template id="tpl-plan">
                       <label class="plan">
                         <div class="card">
                           <header>
                             <div class="flex items-center gap-2">
-                              <h3 class="plan-nombre">Plus</h3>
-                              <span class="badge">Recomendado</span>
+                              <h3 class="plan-nombre" data-plan="nombre"></h3>
+                              <span class="badge" data-plan="recomendado" hidden>Recomendado</span>
                             </div>
-                            <input type="radio" class="input" name="plan" value="plus">
+                            <input type="radio" class="input" name="plan" data-plan="radio">
                           </header>
                           <section>
-                            <p class="plan-precio"><strong>$ 3.000</strong>/ mes</p>
-                            <ul class="coberturas">
-                              <li><svg aria-hidden="true"><use href="#i-check"/></svg>Robo con violencia</li>
-                              <li><svg aria-hidden="true"><use href="#i-check"/></svg>Rotura de pantalla</li>
-                              <li data-incluida="false"><svg aria-hidden="true"><use href="#i-x"/></svg>Hurto / pérdida</li>
-                            </ul>
+                            <p class="plan-precio" data-plan="precio"><strong data-plan="cuota"></strong>/ mes</p>
+                            <ul class="coberturas" data-plan="coberturas"></ul>
                           </section>
                         </div>
                       </label>
-                      <label class="plan">
-                        <div class="card">
-                          <header>
-                            <h3 class="plan-nombre">Premium</h3>
-                            <input type="radio" class="input" name="plan" value="premium">
-                          </header>
-                          <section>
-                            <p class="plan-precio"><strong>$ 4.500</strong>/ mes</p>
-                            <ul class="coberturas">
-                              <li><svg aria-hidden="true"><use href="#i-check"/></svg>Robo con violencia</li>
-                              <li><svg aria-hidden="true"><use href="#i-check"/></svg>Rotura total</li>
-                              <li><svg aria-hidden="true"><use href="#i-check"/></svg>Hurto / pérdida</li>
-                            </ul>
-                          </section>
-                        </div>
-                      </label>
-                    </div>
+                    </template>
+                    <template id="tpl-cobertura">
+                      <li><svg aria-hidden="true"><use href="#i-check"/></svg><span></span></li>
+                    </template>
                   </fieldset>
                 </section>
 

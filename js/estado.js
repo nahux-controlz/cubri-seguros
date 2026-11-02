@@ -18,8 +18,10 @@ export const solicitud = structuredClone(SOLICITUD_INICIAL);
 // Estado de la interfaz: no forma parte de la solicitud, pero render() también
 // lo usa para pintar (qué campos ya se tocaron, si el pago está en curso, etc.).
 export const ui = {
-  tocados: new Set(),
-  procesando: false,
+  tocados: new Set(),     // campos que ya perdieron el foco (o se intentó avanzar)
+  procesando: false,      // pago en curso
+  planes: [],             // catálogo de data/planes.json
+  errorPlanes: false,     // falló el fetch del JSON
 };
 
 // Dónde vive cada campo del formulario dentro de `solicitud`.

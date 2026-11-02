@@ -1,7 +1,9 @@
 // js/render.js
 // Pinta cada paso a partir del estado. render() se puede llamar las veces que
-// haga falta: siempre deja el DOM igual a lo que dice `solicitud`.
-import { solicitud, leerCampo, RUTAS } from './estado.js';
+// haga falta: siempre deja el DOM igual a lo que dicen `solicitud` y `ui`.
+import { solicitud, ui, leerCampo, RUTAS } from './estado.js';
+import { validarPaso, CAMPOS_POR_PASO } from './validaciones.js';
+import { cuotaDelPlan, formatearMoneda } from './cotizador.js';
 
 const TITULOS = {
   1: { barra: 'Cotizá tu seguro', pagina: 'Contanos sobre tu celular', accion: 'Ver planes' },
@@ -10,10 +12,17 @@ const TITULOS = {
   4: { barra: 'Pago', pagina: 'Pago', accion: 'Pagar y contratar' },
 };
 
-const NOMBRES_PLAN = { basico: 'Básico', plus: 'Plus', premium: 'Premium' };
+// Nombre visible de cada campo, para explicar por qué un botón está deshabilitado.
+const ETIQUETAS = {
+  marca: 'marca', modelo: 'modelo', valor: 'valor del equipo', antiguedad: 'antigüedad',
+  nombre: 'nombre', apellido: 'apellido', dni: 'DNI', nacimiento: 'fecha de nacimiento',
+  email: 'email', celular: 'celular', terminos: 'términos y condiciones',
+};
 
-const $ = (selector) => document.querySelector(selector);
-const $$ = (selector) => [...document.querySelectorAll(selector)];
+const lista = new Intl.ListFormat('es', { style: 'long', type: 'conjunction' });
+
+const $ = (selector, raiz = document) => raiz.querySelector(selector);
+const $$ = (selector, raiz = document) => [...raiz.querySelectorAll(selector)];
 
 // Escribe el texto en todos los elementos con data-bind="clave".
 function pintar(clave, texto) {
@@ -26,6 +35,10 @@ function mostrar(selector, visible) {
   $$(selector).forEach((el) => { el.hidden = !visible; });
 }
 
+export function planElegido() {
+  return ui.planes.find((p) => p.id === solicitud.plan) ?? null;
+}
+
 export function render() {
   const { paso } = solicitud;
   document.querySelectorAll('section[data-paso]').forEach((s) => {
@@ -36,7 +49,9 @@ export function render() {
 
   renderEncabezado();
   renderStepper();
+  renderPlanes();
   renderCampos();
+  renderValidacion();
   renderResumen();
   renderResultado();
 }
@@ -61,13 +76,73 @@ function renderStepper() {
     li.dataset.estado = estado;
     if (estado === 'activo') li.setAttribute('aria-current', 'step');
     else li.removeAttribute('aria-current');
-    li.querySelector('.stepper-estado').textContent =
+    $('.stepper-estado', li).textContent =
       estado === 'activo' ? ', paso actual' : estado === 'completo' ? ', completo' : ', pendiente';
   });
 }
 
+// ---------- Planes ----------
+function crearCobertura(texto, incluida) {
+  const li = $('#tpl-cobertura').content.firstElementChild.cloneNode(true);
+  $('span', li).textContent = texto;
+  if (!incluida) {
+    li.dataset.incluida = 'false';
+    $('use', li).setAttribute('href', '#i-x');
+    $('span', li).insertAdjacentHTML('afterbegin', '<span class="sr-only">No incluye: </span>');
+  }
+  return li;
+}
+
+// Las cards se crean una sola vez a partir de data/planes.json; después
+// render() solo actualiza la cuota y cuál está elegida.
+function crearCardsDePlanes() {
+  const contenedor = $('#lista-planes');
+  if (contenedor.children.length || !ui.planes.length) return;
+  const plantilla = $('#tpl-plan').content.firstElementChild;
+  ui.planes.forEach((plan) => {
+    const card = plantilla.cloneNode(true);
+    card.dataset.plan = plan.id;
+    const radio = $('[data-plan="radio"]', card);
+    radio.value = plan.id;
+    radio.id = `plan-${plan.id}`;
+    const nombre = $('[data-plan="nombre"]', card);
+    nombre.textContent = plan.nombre;
+    nombre.id = `plan-${plan.id}-nombre`;
+    $('[data-plan="precio"]', card).id = `plan-${plan.id}-precio`;
+    radio.setAttribute('aria-labelledby', nombre.id);
+    radio.setAttribute('aria-describedby', `plan-${plan.id}-precio plan-${plan.id}-coberturas`);
+    $('[data-plan="recomendado"]', card).hidden = !plan.recomendado;
+    const coberturas = $('[data-plan="coberturas"]', card);
+    coberturas.id = `plan-${plan.id}-coberturas`;
+    plan.coberturas.forEach((c) => coberturas.append(crearCobertura(c, true)));
+    (plan.noIncluye ?? []).forEach((c) => coberturas.append(crearCobertura(c, false)));
+    contenedor.append(card);
+  });
+}
+
+function renderPlanes() {
+  crearCardsDePlanes();
+  mostrar('#planes-cargando', !ui.planes.length && !ui.errorPlanes);
+  mostrar('#planes-error', ui.errorPlanes);
+  ui.planes.forEach((plan) => {
+    const cuota = cuotaDelPlan(plan, solicitud.equipo);
+    pintarEn(`[data-plan="${plan.id}"] [data-plan="cuota"]`, cuota === null ? '—' : formatearMoneda(cuota));
+  });
+}
+
+function pintarEn(selector, texto) {
+  const el = $(selector);
+  if (el && el.textContent !== texto) el.textContent = texto;
+}
+
+// ---------- Campos ----------
 // Rellena los inputs desde el estado: al volver atrás nada se pierde.
 // El campo que tiene el foco no se toca para no mover el cursor.
+function textoDelCampo(campo, valor) {
+  if (campo === 'valor') return valor ? formatearMoneda(valor) : '';
+  return valor ? String(valor) : '';
+}
+
 function renderCampos() {
   $$('input[name], select[name]').forEach((el) => {
     if (!(el.name in RUTAS)) return;
@@ -77,12 +152,60 @@ function renderCampos() {
     } else if (el.type === 'checkbox') {
       el.checked = Boolean(valor);
     } else if (el !== document.activeElement) {
-      const texto = valor ? String(valor) : '';
+      const texto = textoDelCampo(el.name, valor);
       if (el.value !== texto) el.value = texto;
     }
   });
 }
 
+// ---------- Validación ----------
+// Cada campo muestra su error recién después de que la persona salió de él
+// (blur) o intentó avanzar; mientras tanto el botón queda deshabilitado y el
+// texto de ayuda explica qué falta.
+function pintarError(campo, mensaje) {
+  const grupo = $(`[data-campo="${campo}"]`);
+  const control = document.getElementById(campo);
+  const error = document.getElementById(`${campo}-error`);
+  const ayuda = document.getElementById(`${campo}-ayuda`);
+  if (!grupo || !control || !error) return;
+
+  if (mensaje) {
+    grupo.dataset.invalid = '';
+    control.setAttribute('aria-invalid', 'true');
+    if (error.textContent !== mensaje) error.textContent = mensaje;
+    error.hidden = false;
+    control.setAttribute('aria-describedby', error.id);
+  } else {
+    delete grupo.dataset.invalid;
+    control.removeAttribute('aria-invalid');
+    error.hidden = true;
+    error.textContent = '';
+    control.setAttribute('aria-describedby', ayuda ? ayuda.id : error.id);
+  }
+  if (ayuda) ayuda.hidden = Boolean(mensaje);
+}
+
+function renderValidacion() {
+  for (const paso of [1, 3, 4]) {
+    const errores = validarPaso(paso, solicitud);
+    Object.keys(CAMPOS_POR_PASO[paso]).forEach((campo) => {
+      pintarError(campo, ui.tocados.has(campo) ? errores[campo] : null);
+    });
+
+    // "Ver planes" y "Continuar al pago" se habilitan solo con todo válido.
+    if (paso === 4) continue;
+    const invalidos = Object.keys(errores);
+    const boton = $(`#${paso === 1 ? 'form-cotizar' : 'form-datos'} button[type="submit"]`);
+    boton.disabled = invalidos.length > 0;
+    const ayuda = $(`#ayuda-paso-${paso}`);
+    ayuda.hidden = invalidos.length === 0;
+    ayuda.textContent = invalidos.length
+      ? `Para continuar, completá: ${lista.format(invalidos.map((c) => ETIQUETAS[c]))}.`
+      : '';
+  }
+}
+
+// ---------- Resumen ----------
 function nombreEquipo() {
   const { marca, modelo } = solicitud.equipo;
   return [marca, modelo.trim()].filter(Boolean).join(' ');
@@ -97,16 +220,17 @@ function nombreTitular() {
 // card lateral en desktop, barra arriba del botón (paso 2) o card arriba del
 // formulario (paso 4) en mobile.
 function renderResumen() {
-  const { paso } = solicitud;
-  const plan = NOMBRES_PLAN[solicitud.plan];
+  const { paso, equipo } = solicitud;
+  const plan = planElegido();
+  const cuota = cuotaDelPlan(plan, equipo);
 
   pintar('resumen.seguro', 'Celular');
   pintar('resumen.equipo', nombreEquipo() || '—');
-  pintar('resumen.valor', solicitud.equipo.valor ? String(solicitud.equipo.valor) : '—');
-  pintar('resumen.plan', plan);
+  pintar('resumen.valor', equipo.valor ? formatearMoneda(equipo.valor) : '—');
+  pintar('resumen.plan', plan?.nombre ?? '—');
   pintar('resumen.titular', nombreTitular() || '—');
-  pintar('resumen.total', '—');
-  pintar('resumen.compacto', `Plan ${plan} · ${solicitud.equipo.modelo.trim() || solicitud.equipo.marca || 'tu equipo'}`);
+  pintar('resumen.total', cuota === null ? '—' : formatearMoneda(cuota));
+  pintar('resumen.compacto', `Plan ${plan?.nombre ?? ''} · ${equipo.modelo.trim() || equipo.marca || 'tu equipo'}`);
 
   mostrar('#resumen [data-fila="valor"]', paso === 1);
   mostrar('#resumen [data-fila="plan"]', paso >= 2);
@@ -116,13 +240,17 @@ function renderResumen() {
 }
 
 function renderResultado() {
+  const plan = planElegido();
+  const cuota = cuotaDelPlan(plan, solicitud.equipo);
   pintar('exito.nombre', solicitud.titular.nombre.trim());
   pintar('exito.email', solicitud.titular.email.trim());
   pintar('exito.poliza', solicitud.poliza ?? '');
-  pintar('exito.plan', NOMBRES_PLAN[solicitud.plan]);
+  pintar('exito.plan', plan?.nombre ?? '');
   pintar('exito.equipo', nombreEquipo());
+  pintar('exito.cuota', cuota === null ? '' : formatearMoneda(cuota));
 }
 
+// ---------- Foco ----------
 // Después de cambiar de paso: arriba de todo y foco en el título, para que
 // teclado y lectores de pantalla arranquen desde el principio del paso.
 export function enfocarPaso() {
@@ -130,4 +258,14 @@ export function enfocarPaso() {
   const titulo = $(titulos[solicitud.paso] ?? '#titulo-paso');
   window.scrollTo({ top: 0, behavior: 'instant' });
   titulo?.focus({ preventScroll: true });
+}
+
+// Al intentar avanzar con errores: foco al primer campo inválido del paso.
+export function enfocarPrimerError(paso) {
+  const errores = validarPaso(paso, solicitud);
+  const primero = Object.keys(CAMPOS_POR_PASO[paso]).find((campo) => campo in errores);
+  if (!primero) return;
+  const control = document.getElementById(primero);
+  const foco = control.matches('[role="radiogroup"]') ? $('input', control) : control;
+  foco.focus();
 }
