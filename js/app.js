@@ -46,7 +46,24 @@ function alCambiarCampo(evento) {
 
 // ---------- Navegación ----------
 function volver() {
+  if (solicitud.paso === 1) ui.editando = false;
   if (solicitud.paso > 0) irAPaso(solicitud.paso - 1);
+}
+
+// Avanza al paso siguiente; si se vino desde "Editar" del resumen de pago,
+// vuelve directo al pago (siempre que los pasos anteriores sigan completos).
+function avanzar(siguiente) {
+  if (!ui.editando) {
+    irAPaso(siguiente);
+    return;
+  }
+  const incompleto = primerPasoInvalido(solicitud, 3);
+  if (incompleto) {
+    pasoValido(incompleto);
+    return;
+  }
+  ui.editando = false;
+  irAPaso(4);
 }
 
 const ACCIONES = {
@@ -70,6 +87,11 @@ const ACCIONES = {
     document.querySelector('input[name="metodo"]:checked')?.focus();
   },
   descargar: descargarPoliza,
+  // Bonus: links "Editar" del resumen de pago
+  editar: (boton) => {
+    ui.editando = true;
+    irAPaso(Number(boton.dataset.destino));
+  },
   'recargar-planes': () => {
     ui.errorPlanes = false;
     render();
@@ -161,11 +183,11 @@ const AL_ENVIAR = {
   'form-cotizar': async () => {
     if (!pasoValido(1)) return;
     await cargarPlanes();
-    irAPaso(2);
+    avanzar(2);
   },
-  'form-plan': () => irAPaso(3),
+  'form-plan': () => avanzar(3),
   'form-datos': () => {
-    if (pasoValido(3)) irAPaso(4);
+    if (pasoValido(3)) avanzar(4);
   },
   'form-pago': pagar,
 };

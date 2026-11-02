@@ -61,10 +61,13 @@ export function render() {
 
 function renderEncabezado() {
   const titulos = TITULOS[solicitud.paso];
+  // Bonus "Editar desde el resumen": el botón principal vuelve directo al pago.
+  for (const paso of [1, 2, 3]) {
+    pintar(`accion.${paso}`, ui.editando ? 'Guardar y volver al pago' : TITULOS[paso].accion);
+  }
   if (titulos) {
     pintar('barra.titulo', titulos.barra);
     pintar('paso.titulo', titulos.pagina);
-    pintar(`accion.${solicitud.paso}`, titulos.accion);
     document.title = `Paso ${solicitud.paso} de 4 · ${titulos.pagina} — Cubrí Seguros`;
   } else {
     document.title = 'Cubrí Seguros';
@@ -240,6 +243,7 @@ function renderResumen() {
   mostrar('#resumen [data-fila="titular"]', paso === 4);
   mostrar('#resumen [data-fila="total"]', paso >= 2);
   mostrar('#resumen [data-fila="nota"]', paso === 1);
+  mostrar('#resumen .resumen-editar', paso === 4 && !ui.procesando);
 }
 
 // ---------- Pago ----------

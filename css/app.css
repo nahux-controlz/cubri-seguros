@@ -372,6 +372,23 @@
     text-align: right;
   }
 
+  .resumen-editar {
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+  }
+
+  .resumen-editar:hover {
+    text-decoration: underline;
+  }
+
+  .resumen-editar:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
   .resumen-total {
     display: flex;
     align-items: baseline;
