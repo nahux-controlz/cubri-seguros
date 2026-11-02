@@ -4,6 +4,7 @@
 import { solicitud, ui, leerCampo, RUTAS } from './estado.js';
 import { validarPaso, CAMPOS_POR_PASO } from './validaciones.js';
 import { cuotaDelPlan, formatearMoneda } from './cotizador.js';
+import { ultimosDigitos } from './pago.js';
 
 const TITULOS = {
   1: { barra: 'Cotizá tu seguro', pagina: 'Contanos sobre tu celular', accion: 'Ver planes' },
@@ -20,6 +21,7 @@ const ETIQUETAS = {
 };
 
 const lista = new Intl.ListFormat('es', { style: 'long', type: 'conjunction' });
+export const formatoFecha = new Intl.DateTimeFormat('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
 const $ = (selector, raiz = document) => raiz.querySelector(selector);
 const $$ = (selector, raiz = document) => [...raiz.querySelectorAll(selector)];
@@ -53,6 +55,7 @@ export function render() {
   renderCampos();
   renderValidacion();
   renderResumen();
+  renderPago();
   renderResultado();
 }
 
@@ -239,6 +242,18 @@ function renderResumen() {
   mostrar('#resumen [data-fila="nota"]', paso === 1);
 }
 
+// ---------- Pago ----------
+// Durante el pago el botón queda en "Procesando…" y deshabilitado: así no se
+// puede pagar dos veces. Se vuelve a habilitar solo si el pago falla.
+function renderPago() {
+  const boton = $('#boton-pagar');
+  boton.disabled = ui.procesando;
+  boton.toggleAttribute('aria-busy', ui.procesando);
+  $('[data-cargando]', boton).classList.toggle('hidden', !ui.procesando);
+  pintar('accion.4', ui.procesando ? 'Procesando…' : TITULOS[4].accion);
+  $$('#form-pago [data-accion="volver"], #form-pago input').forEach((el) => { el.disabled = ui.procesando; });
+}
+
 function renderResultado() {
   const plan = planElegido();
   const cuota = cuotaDelPlan(plan, solicitud.equipo);
@@ -247,7 +262,10 @@ function renderResultado() {
   pintar('exito.poliza', solicitud.poliza ?? '');
   pintar('exito.plan', plan?.nombre ?? '');
   pintar('exito.equipo', nombreEquipo());
+  pintar('exito.vigencia', ui.emision ? formatoFecha.format(ui.emision) : '');
   pintar('exito.cuota', cuota === null ? '' : formatearMoneda(cuota));
+  pintar('error.motivo', ui.errorPago ?? 'Tarjeta rechazada');
+  pintar('error.tarjeta', ultimosDigitos(solicitud.pago.tarjeta));
 }
 
 // ---------- Foco ----------

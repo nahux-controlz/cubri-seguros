@@ -22,6 +22,8 @@ export const ui = {
   procesando: false,      // pago en curso
   planes: [],             // catálogo de data/planes.json
   errorPlanes: false,     // falló el fetch del JSON
+  errorPago: null,        // motivo del rechazo que devolvió simularPago()
+  emision: null,          // fecha en que se emitió la póliza
 };
 
 // Dónde vive cada campo del formulario dentro de `solicitud`.
@@ -74,4 +76,6 @@ export function reiniciarSolicitud() {
   Object.assign(solicitud, structuredClone(SOLICITUD_INICIAL));
   ui.tocados.clear();
   ui.procesando = false;
+  ui.errorPago = null;
+  ui.emision = null;
 }

@@ -476,7 +476,7 @@
         <div class="alert w-full text-left" data-variant="destructive">
           <svg aria-hidden="true"><use href="#i-alerta"/></svg>
           <h2 data-bind="error.motivo"></h2>
-          <section class="text-xs">Tarjeta de prueba que fuerza el error: 4000 0000 0000 0002</section>
+          <section class="text-xs">Tarjeta terminada en <span data-bind="error.tarjeta"></span>. La tarjeta de prueba que fuerza el error es 4000 0000 0000 0002.</section>
         </div>
         <div class="dock mt-4 w-full lg:grid lg:grid-cols-2">
           <button type="button" class="btn w-full" data-accion="reintentar">Reintentar pago</button>

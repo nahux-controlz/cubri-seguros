@@ -3,8 +3,10 @@
 // se llama a render() (a través de las funciones de estado.js).
 import { solicitud, ui, RUTAS, actualizarCampo, marcarTocado, irAPaso, reiniciarSolicitud } from './estado.js';
 import { render, enfocarPrimerError } from './render.js';
-import { validarPaso, CAMPOS_POR_PASO } from './validaciones.js';
-import { aNumero } from './cotizador.js';
+import { validarPaso, primerPasoInvalido, CAMPOS_POR_PASO } from './validaciones.js';
+import { aNumero, cuotaDelPlan, formatearMoneda, ETIQUETA_ANTIGUEDAD } from './cotizador.js';
+import { simularPago, generarPoliza, siguienteContador, ultimosDigitos } from './pago.js';
+import { planElegido, formatoFecha } from './render.js';
 
 // ---------- Planes (data/planes.json) ----------
 let cargaDePlanes = null;
@@ -57,8 +59,16 @@ const ACCIONES = {
     reiniciarSolicitud();
     irAPaso(0);
   },
-  reintentar: () => irAPaso(4),
-  'cambiar-medio': () => irAPaso(4),
+  // Desde el error se vuelve al pago con todos los datos cargados.
+  reintentar: () => {
+    irAPaso(4);
+    document.getElementById('boton-pagar').focus();
+  },
+  'cambiar-medio': () => {
+    irAPaso(4);
+    document.querySelector('input[name="metodo"]:checked')?.focus();
+  },
+  descargar: descargarPoliza,
   'recargar-planes': () => {
     ui.errorPlanes = false;
     render();
@@ -85,9 +95,65 @@ function alHacerClick(evento) {
 function pasoValido(paso) {
   const errores = validarPaso(paso, solicitud);
   if (Object.keys(errores).length === 0) return true;
+  if (solicitud.paso !== paso) irAPaso(paso);
   marcarTocado(...Object.keys(CAMPOS_POR_PASO[paso]));
   enfocarPrimerError(paso);
   return false;
+}
+
+// ---------- Pago ----------
+async function pagar() {
+  if (ui.procesando) return;                       // evita el doble pago
+  const pasoIncompleto = primerPasoInvalido(solicitud, 3);
+  if (pasoIncompleto && !pasoValido(pasoIncompleto)) return;
+  if (!pasoValido(4)) return;
+
+  ui.procesando = true;
+  render();                                        // "Procesando…" y botón deshabilitado ya
+  const resultado = await simularPago(solicitud.pago.tarjeta);
+  ui.procesando = false;
+
+  if (resultado.ok) {
+    solicitud.poliza = generarPoliza(siguienteContador());
+    ui.emision = new Date();
+    ui.errorPago = null;
+    irAPaso(5);
+  } else {
+    ui.errorPago = resultado.motivo;
+    irAPaso(6);
+  }
+}
+
+// "Descargar póliza": un comprobante de texto armado con los datos del estado.
+function descargarPoliza() {
+  const plan = planElegido();
+  const { equipo, titular, pago } = solicitud;
+  const cuota = cuotaDelPlan(plan, equipo);
+  const lineas = [
+    'CUBRÍ SEGUROS · Póliza de seguro de celular',
+    '='.repeat(44),
+    `Póliza: ${solicitud.poliza}`,
+    `Vigencia desde: ${formatoFecha.format(ui.emision ?? new Date())}`,
+    '',
+    `Titular: ${titular.nombre.trim()} ${titular.apellido.trim()} · DNI ${titular.dni}`,
+    `Email: ${titular.email.trim()} · Celular: ${titular.celular.trim()}`,
+    '',
+    `Equipo: ${equipo.marca} ${equipo.modelo.trim()}`,
+    `Valor asegurado: ${formatearMoneda(equipo.valor)} · Antigüedad: ${ETIQUETA_ANTIGUEDAD[equipo.antiguedad]}`,
+    '',
+    `Plan: ${plan.nombre}`,
+    `Coberturas: ${plan.coberturas.join(', ')}`,
+    `Cuota mensual: ${formatearMoneda(cuota)}`,
+    `Medio de pago: tarjeta de ${pago.metodo === 'credito' ? 'crédito' : 'débito'} terminada en ${ultimosDigitos(pago.tarjeta)}`,
+    '',
+    'Documento de una práctica académica: no tiene validez legal.',
+  ];
+  const archivo = new Blob([lineas.join('\n')], { type: 'text/plain;charset=utf-8' });
+  const enlace = document.createElement('a');
+  enlace.href = URL.createObjectURL(archivo);
+  enlace.download = `${solicitud.poliza}.txt`;
+  enlace.click();
+  setTimeout(() => URL.revokeObjectURL(enlace.href), 1000);
 }
 
 const AL_ENVIAR = {
@@ -100,9 +166,7 @@ const AL_ENVIAR = {
   'form-datos': () => {
     if (pasoValido(3)) irAPaso(4);
   },
-  'form-pago': () => {
-    if (pasoValido(4)) irAPaso(5);
-  },
+  'form-pago': pagar,
 };
 
 function alEnviar(evento) {
