@@ -671,6 +671,13 @@
       display: none;
     }
 
+    /* Los toasts arriba en mobile para no tapar los botones fijos de abajo */
+    .toaster {
+      top: 0;
+      bottom: auto;
+      flex-direction: column;
+    }
+
     /* La barra superior con el logo solo aparece en el inicio; en el
      * checkout la reemplaza la barra con "Volver" y el título del paso. */
     body[data-vista]:not([data-vista="0"]) .barra {

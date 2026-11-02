@@ -89,6 +89,11 @@ const ACCIONES = {
     document.querySelector('input[name="metodo"]:checked')?.focus();
   },
   descargar: descargarPoliza,
+  'mi-cuenta': () => mostrarToast({
+    category: 'info',
+    title: 'Mi cuenta',
+    description: 'Muy pronto vas a poder ver tus pólizas desde acá.',
+  }),
   // Bonus: links "Editar" del resumen de pago
   editar: (boton) => {
     ui.editando = true;
@@ -126,6 +131,13 @@ function pasoValido(paso) {
   return false;
 }
 
+// ---------- Toasts (bonus) ----------
+// toast.js de Basecoat le agrega el método toast() al #toaster. Si el CDN no
+// cargó, simplemente no se muestra nada: el flujo no depende del toast.
+function mostrarToast(config) {
+  document.getElementById('toaster')?.toast?.(config);
+}
+
 // ---------- Pago ----------
 async function pagar() {
   if (ui.procesando) return;                       // evita el doble pago
@@ -143,6 +155,11 @@ async function pagar() {
     ui.emision = new Date();
     ui.errorPago = null;
     irAPaso(5);
+    mostrarToast({
+      category: 'success',
+      title: 'Pago aprobado',
+      description: `Tu póliza ${solicitud.poliza} ya está activa.`,
+    });
   } else {
     ui.errorPago = resultado.motivo;
     irAPaso(6);
