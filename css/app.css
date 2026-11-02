@@ -1,0 +1,807 @@
+/* css/app.css
+ * Piezas que Basecoat no trae (stepper, chips, cards de plan, resumen,
+ * catálogo) y ajustes de tamaño para que los componentes coincidan con el
+ * Figma. Todo va en @layer components: las utilidades de Tailwind siguen
+ * pudiendo pisar estos estilos desde el HTML.
+ *
+ * Breakpoint: mobile first, cambios de desktop desde 1024px (lg: de Tailwind).
+ */
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+@layer components {
+  /* ---------- Marca ---------- */
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--primary-700);
+    border-radius: var(--radius-md);
+  }
+
+  .logo-icono {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0.5rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .logo-icono svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0.75rem;
+    z-index: 100;
+  }
+
+  .skip-link:focus {
+    left: 0.75rem;
+  }
+
+  /* ---------- Botones (Button Primary / Secondary / Ghost / Disabled) ---------- */
+  .btn {
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+  }
+
+  .btn:not([data-size]) {
+    height: 3rem;
+    padding-inline: 1.25rem;
+    font-size: 0.9375rem;
+  }
+
+  .btn[data-variant="outline"] {
+    border-color: var(--primary);
+    background: var(--card);
+    color: var(--primary);
+  }
+
+  .btn[data-variant="outline"]:hover {
+    background: var(--primary-50);
+  }
+
+  .btn[data-variant="ghost"] {
+    color: var(--primary);
+  }
+
+  .btn:is(:not([data-variant]), [data-variant="primary"]):disabled {
+    background: var(--disabled);
+    color: var(--disabled-foreground);
+    opacity: 1;
+  }
+
+  /* ---------- Campos (Input + label + ayuda / Input con error) ---------- */
+  .field {
+    gap: 0.375rem;
+  }
+
+  .field[data-invalid] {
+    color: inherit;
+  }
+
+  .field > label,
+  .field > .label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .field > p {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  .field [role="alert"] {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--destructive);
+  }
+
+  /* ---------- Chips de antigüedad (radio + label) ---------- */
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 2.5rem;
+    padding-inline: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    background: var(--card);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--foreground);
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+  }
+
+  .chip:hover {
+    border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+  }
+
+  .chip input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .chip:has(input:checked) {
+    border-color: var(--primary);
+    box-shadow: inset 0 0 0 1px var(--primary);
+    background: var(--primary-50);
+    color: var(--primary-700);
+    font-weight: 600;
+  }
+
+  .chip:has(input:focus-visible) {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .chips[aria-invalid="true"] .chip {
+    border-color: var(--destructive);
+  }
+
+  /* ---------- Stepper (no existe en Basecoat: Tailwind a mano) ---------- */
+  .stepper ol {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .stepper li {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    color: var(--muted-foreground);
+  }
+
+  .stepper li:not(:last-child) {
+    flex: 1;
+  }
+
+  .stepper li:not(:last-child)::after {
+    content: "";
+    flex: 1;
+    min-width: 0.75rem;
+    height: 1px;
+    margin-left: 0.125rem;
+    background: var(--border);
+  }
+
+  .stepper-marca {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 1.5px solid var(--border);
+    border-radius: 9999px;
+    background: var(--card);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--subtle);
+  }
+
+  .stepper-marca svg {
+    display: none;
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  .stepper li[data-estado="activo"] {
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .stepper li[data-estado="activo"] .stepper-marca {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .stepper li[data-estado="completo"] {
+    font-weight: 600;
+    color: var(--success);
+  }
+
+  .stepper li[data-estado="completo"] .stepper-marca {
+    border-color: var(--success);
+    background: var(--success);
+    color: var(--card);
+  }
+
+  .stepper li[data-estado="completo"] .stepper-marca svg {
+    display: block;
+  }
+
+  .stepper li[data-estado="completo"] .stepper-numero {
+    display: none;
+  }
+
+  .stepper li[data-estado="completo"]::after {
+    height: 2px;
+    background: var(--success);
+  }
+
+  /* ---------- Cards de plan (<label> que envuelve un .card + radio) ---------- */
+  .plan {
+    display: block;
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+  }
+
+  .plan > .card {
+    height: 100%;
+    gap: 0.75rem;
+    padding-block: 1rem;
+    transition: box-shadow 0.15s;
+  }
+
+  .plan:hover > .card {
+    --tw-ring-color: color-mix(in oklab, var(--primary) 40%, transparent);
+  }
+
+  .plan:has(input:checked) > .card {
+    box-shadow:
+      0 0 0 2px var(--primary),
+      0 0 0 6px color-mix(in oklab, var(--primary) 14%, transparent);
+  }
+
+  .plan:has(input:focus-visible) > .card {
+    outline: 2px solid var(--ring);
+    outline-offset: 6px;
+  }
+
+  .plan > .card > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-inline: 1rem;
+  }
+
+  .plan > .card > section {
+    display: grid;
+    gap: 0.75rem;
+    padding-inline: 1rem;
+  }
+
+  .plan .plan-nombre {
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  .plan-precio {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+  }
+
+  .plan-precio strong {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+
+  .coberturas {
+    display: grid;
+    gap: 0.375rem;
+  }
+
+  .coberturas li {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+  }
+
+  .coberturas svg {
+    flex: none;
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--success);
+  }
+
+  .coberturas li[data-incluida="false"] {
+    color: var(--subtle);
+  }
+
+  .coberturas li[data-incluida="false"] svg {
+    color: var(--subtle);
+  }
+
+  /* ---------- Resumen (card lateral en desktop, barra en mobile) ---------- */
+  .resumen > header h2 {
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  .resumen-filas {
+    display: grid;
+    gap: 0.625rem;
+  }
+
+  .resumen-filas > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .resumen-filas dt {
+    color: var(--muted-foreground);
+  }
+
+  .resumen-filas dd {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .resumen-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 0.875rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+  }
+
+  .resumen-total strong {
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: var(--foreground);
+  }
+
+  .resumen-nota {
+    margin-top: 0.875rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  .resumen > footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  .resumen > footer svg {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    color: var(--success);
+  }
+
+  .resumen-compacto {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+  }
+
+  .resumen-compacto strong {
+    font-size: 0.9375rem;
+    font-weight: 800;
+    color: var(--foreground);
+  }
+
+  /* ---------- Catálogo de productos ---------- */
+  .producto {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+    min-height: 8.75rem;
+    padding: 0.875rem;
+    border-radius: var(--radius-xl);
+    background: var(--card);
+    box-shadow: inset 0 0 0 1px var(--border);
+    text-align: left;
+    transition: box-shadow 0.15s;
+  }
+
+  button.producto {
+    cursor: pointer;
+  }
+
+  button.producto:hover {
+    box-shadow:
+      inset 0 0 0 1.5px var(--primary),
+      0 8px 20px -10px color-mix(in oklab, var(--primary) 45%, transparent);
+  }
+
+  button.producto:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  .producto[aria-pressed="true"] {
+    box-shadow: inset 0 0 0 1.5px var(--primary);
+  }
+
+  .producto[aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  .producto-icono {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-bottom: auto;
+    border-radius: var(--radius-md);
+    background: var(--primary-50);
+    color: var(--primary);
+  }
+
+  .producto-icono svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .producto[aria-disabled="true"] .producto-icono {
+    background: var(--secondary);
+    color: var(--muted-foreground);
+  }
+
+  .producto-nombre {
+    margin-top: 1rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  .producto-desc {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  .producto-precio {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .producto > .badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .badge.badge-exito {
+    background: var(--success-50);
+    color: var(--success);
+    font-weight: 700;
+  }
+
+  /* ---------- Avisos ---------- */
+  .alert.alerta-aviso {
+    border-color: var(--warning-200);
+    background: var(--warning-50);
+    color: var(--warning-700);
+  }
+
+  .alert.alerta-aviso > section {
+    color: inherit;
+  }
+
+  /* ---------- Opciones de medio de pago ---------- */
+  .opciones-pago > label {
+    border-color: var(--border);
+    background: var(--card);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .opciones-pago > label:has(input:checked) {
+    border-color: var(--primary);
+    box-shadow: inset 0 0 0 1px var(--primary);
+  }
+
+  /* ---------- Éxito / error ---------- */
+  .icono-resultado {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 9999px;
+  }
+
+  .icono-resultado svg {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .icono-resultado[data-tipo="exito"] {
+    background: var(--success-50);
+    color: var(--success);
+  }
+
+  .icono-resultado[data-tipo="error"] {
+    background: var(--destructive-50);
+    color: var(--destructive);
+  }
+
+  .poliza-numero {
+    display: inline-block;
+    padding: 0.375rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-50);
+    font-size: 0.9375rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--primary-700);
+  }
+
+  .detalle {
+    display: grid;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    box-shadow: inset 0 0 0 1px var(--border);
+    text-align: left;
+  }
+
+  .detalle > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .detalle dt {
+    color: var(--muted-foreground);
+  }
+
+  .detalle dd {
+    font-weight: 700;
+    text-align: right;
+  }
+
+  /* ---------- Dock de acciones ----------
+   * En mobile los botones van fijos abajo y a todo el ancho. Solo se fijan
+   * cuando app.js ya arrancó (body[data-vista]); sin JS quedan en el flujo. */
+  .dock {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .dock .btn {
+    width: 100%;
+  }
+
+  @media (max-width: 1023.98px) {
+    body[data-vista] .dock {
+      position: fixed;
+      inset-inline: 0;
+      bottom: 0;
+      z-index: 30;
+      padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--border);
+      background: var(--card);
+    }
+
+    .dock [data-solo="desktop"] {
+      display: none;
+    }
+
+    /* El formulario se ve "plano" en mobile: sin card, sobre el fondo de página */
+    .checkout-form.card {
+      overflow: visible;
+      padding-block: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .checkout-form.card > section {
+      padding-inline: 0;
+    }
+
+    .checkout-form.card > footer.dock {
+      padding-inline: 1.25rem;
+    }
+
+    /* Resumen: barra fija arriba del botón en el paso 2, card arriba del
+     * formulario en el paso 4 y oculto en los pasos 1 y 3. */
+    .resumen {
+      display: none;
+    }
+
+    /* La barra superior con el logo solo aparece en el inicio; en el
+     * checkout la reemplaza la barra con "Volver" y el título del paso. */
+    body[data-vista]:not([data-vista="0"]) .barra {
+      display: none;
+    }
+
+    body[data-vista="2"] .resumen {
+      display: block;
+      position: fixed;
+      inset-inline: 0;
+      bottom: calc(5rem + env(safe-area-inset-bottom));
+      z-index: 30;
+      padding: 0.875rem 1.25rem 0.25rem;
+      border-top: 1px solid var(--border);
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    body[data-vista="2"] .resumen > :not(.resumen-compacto) {
+      display: none;
+    }
+
+    body[data-vista="2"] .resumen-compacto {
+      display: flex;
+    }
+
+    body[data-vista="2"] .checkout-form > footer.dock {
+      border-top: 0;
+    }
+
+    body[data-vista="4"] .resumen {
+      display: flex;
+      order: -1;
+      padding-block: 1rem;
+      background: var(--primary-50);
+      box-shadow: inset 0 0 0 1px var(--primary-100);
+    }
+
+    body[data-vista="4"] .resumen > :is(header, footer) {
+      display: none;
+    }
+
+    body[data-vista="4"] .resumen > section {
+      padding-inline: 1rem;
+    }
+
+    /* El título de página solo se muestra en mobile en el paso 1
+     * ("Contanos sobre tu celular"); en el resto queda para lectores de pantalla. */
+    body[data-vista]:not([data-vista="1"]) .encabezado-paso {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .dock {
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .dock .btn {
+      width: auto;
+      min-width: 10rem;
+    }
+
+    .dock .btn[type="submit"],
+    .dock .btn[data-ancho="principal"] {
+      min-width: 15rem;
+    }
+
+    .dock [data-solo="mobile"] {
+      display: none;
+    }
+
+    .checkout-form > footer.dock {
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .stepper li {
+      font-size: 0.8125rem;
+    }
+
+    .stepper-marca {
+      width: 1.5rem;
+      height: 1.5rem;
+      font-size: 0.75rem;
+    }
+
+    .stepper li:not(:last-child)::after {
+      margin-left: 0.5rem;
+    }
+
+    .stepper li:not(:first-child) {
+      padding-left: 0.25rem;
+    }
+
+    .detalle {
+      background: var(--muted);
+      box-shadow: none;
+    }
+  }
+}
+
+/* ---------- Controles de formulario ----------
+ * Fuera de @layer a propósito: Basecoat usa selectores muy específicos para
+ * los inputs (p. ej. .field > input[type='text']:not(:is(...))) y para
+ * [role='radiogroup']. Una regla sin capa gana sin importar la especificidad,
+ * así el alto (48px), radio y colores coinciden con el Figma. */
+.field > :is(input:not([type="checkbox"], [type="radio"]), select) {
+  width: 100%;
+  height: 3rem;
+  border-color: var(--input);
+  border-radius: var(--radius-md);
+  background-color: var(--card);
+  font-size: 0.9375rem;
+  color: var(--foreground);
+}
+
+.field > input:not([type="checkbox"], [type="radio"]) {
+  padding-inline: 0.875rem;
+}
+
+.field > select {
+  padding-left: 0.875rem;
+}
+
+.field > input::placeholder {
+  color: var(--subtle);
+}
+
+.field > :is(input, select):focus-visible {
+  border-color: var(--primary);
+  --tw-ring-color: color-mix(in oklab, var(--primary) 20%, transparent);
+}
+
+.field > :is(input, select)[aria-invalid="true"] {
+  border-color: var(--destructive);
+  background-color: var(--destructive-50);
+}
+
+.field > .chips {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0.5rem;
+}

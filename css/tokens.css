@@ -1,0 +1,41 @@
+/* css/tokens.css
+ * Tokens del Figma ("Componentes y tokens") aplicados sobre las variables
+ * de Basecoat UI (estilo shadcn). Este archivo va después de basecoat.css,
+ * así que estas variables pisan a las de la librería.
+ */
+:root {
+  --primary: #4F46E5;            /* indigo-600 */
+  --primary-foreground: #FFFFFF;
+  --radius: 0.75rem;
+
+  /* Paleta del diseño */
+  --primary-700: #3730A3;        /* indigo-800 · textos destacados */
+  --primary-50: #EEF2FF;         /* indigo-50 · fondos de selección y resumen */
+  --primary-100: #E0E7FF;
+  --success: #059669;            /* emerald-600 · pasos completos, éxito */
+  --success-50: #ECFDF5;
+  --destructive: #DC2626;        /* red-600 · errores de validación y pago */
+  --destructive-50: #FEF2F2;
+  --warning-50: #FFFBEB;         /* aviso de simulación */
+  --warning-200: #FDE68A;
+  --warning-700: #B45309;
+  --foreground: #0F172A;         /* slate-900 · texto principal */
+  --card-foreground: #0F172A;
+  --muted-foreground: #64748B;   /* slate-500 · textos secundarios */
+  --subtle: #94A3B8;             /* slate-400 · placeholders, pendientes */
+  --border: #E2E8F0;             /* slate-200 · bordes */
+  --input: #E2E8F0;
+  --ring: #4F46E5;
+  --background: #F5F7FB;         /* fondo de página */
+  --card: #FFFFFF;
+  --muted: #F8FAFC;
+  --secondary: #F1F5F9;
+  --secondary-foreground: #0F172A;
+  --accent: #EEF2FF;
+  --accent-foreground: #3730A3;
+  --disabled: #CBD5E1;           /* botón deshabilitado */
+  --disabled-foreground: #FFFFFF;
+
+  /* Tipografía: Inter · H2 24/800 · lead 15/400 · label 13/600 · help 12/400 */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+}
