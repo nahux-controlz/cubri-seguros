@@ -3,6 +3,7 @@
 // se llama a render() (a través de las funciones de estado.js).
 import { solicitud, ui, RUTAS, actualizarCampo, marcarTocado, irAPaso, reiniciarSolicitud, restaurarSolicitud } from './estado.js';
 import { leerSolicitud } from './persistencia.js';
+import { aplicarMascara } from './mascaras.js';
 import { render, enfocarPrimerError } from './render.js';
 import { validarPaso, primerPasoInvalido, CAMPOS_POR_PASO } from './validaciones.js';
 import { aNumero, cuotaDelPlan, formatearMoneda, ETIQUETA_ANTIGUEDAD } from './cotizador.js';
@@ -41,6 +42,7 @@ function valorDelInput(el) {
 function alCambiarCampo(evento) {
   const el = evento.target;
   if (!(el.name in RUTAS)) return;
+  aplicarMascara(el);   // bonus: tarjeta en grupos de 4, vencimiento con barra, miles en el valor
   actualizarCampo(el.name, valorDelInput(el));
 }
 
