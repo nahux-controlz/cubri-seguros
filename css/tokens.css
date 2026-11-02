@@ -39,3 +39,38 @@
   /* Tipografía: Inter · H2 24/800 · lead 15/400 · label 13/600 · help 12/400 */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 }
+
+/* Bonus modo oscuro: Basecoat aplica .dark en <html>; acá se redefinen las
+ * mismas variables, así ningún componente necesita estilos propios. */
+.dark {
+  --primary: #6366F1;            /* indigo-500: más contraste sobre fondo oscuro */
+  --primary-foreground: #FFFFFF;
+  --primary-700: #A5B4FC;
+  --primary-50: rgb(99 102 241 / 0.16);
+  --primary-100: rgb(99 102 241 / 0.32);
+  --success: #34D399;
+  --success-50: rgb(16 185 129 / 0.16);
+  --destructive: #F87171;
+  --destructive-50: rgb(248 113 113 / 0.12);
+  --warning-50: rgb(245 158 11 / 0.12);
+  --warning-200: rgb(245 158 11 / 0.35);
+  --warning-700: #FCD34D;
+  --foreground: #F1F5F9;
+  --card-foreground: #F1F5F9;
+  --muted-foreground: #94A3B8;
+  --subtle: #64748B;
+  --border: #1E293B;
+  --input: #334155;
+  --ring: #818CF8;
+  --background: #0B1020;
+  --card: #111827;
+  --popover: #111827;
+  --popover-foreground: #F1F5F9;
+  --muted: #0F172A;
+  --secondary: #1E293B;
+  --secondary-foreground: #F1F5F9;
+  --accent: rgb(99 102 241 / 0.16);
+  --accent-foreground: #E0E7FF;
+  --disabled: #334155;
+  --disabled-foreground: #94A3B8;
+}

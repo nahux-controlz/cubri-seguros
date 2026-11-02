@@ -50,6 +50,16 @@
     height: 1rem;
   }
 
+  /* Botón de tema: muestra la luna en claro y el sol en oscuro */
+  .boton-tema .icono-sol,
+  .dark .boton-tema .icono-luna {
+    display: none;
+  }
+
+  .dark .boton-tema .icono-sol {
+    display: block;
+  }
+
   .skip-link {
     position: absolute;
     left: -9999px;
@@ -80,6 +90,16 @@
   }
 
   .btn[data-variant="outline"]:hover {
+    background: var(--primary-50);
+  }
+
+  /* Basecoat cambia el borde del outline en .dark con un selector más específico */
+  .dark .btn[data-variant="outline"]:not(.border-border) {
+    border-color: var(--primary);
+    background: var(--card);
+  }
+
+  .dark .btn[data-variant="outline"]:not(.border-border):hover {
     background: var(--primary-50);
   }
 

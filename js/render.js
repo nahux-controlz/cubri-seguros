@@ -57,6 +57,16 @@ export function render() {
   renderResumen();
   renderPago();
   renderResultado();
+  renderTema();
+}
+
+// Bonus modo oscuro: el botón indica si el modo oscuro está activo.
+function renderTema() {
+  const oscuro = document.documentElement.classList.contains('dark');
+  $$('[data-accion="tema"]').forEach((boton) => {
+    boton.setAttribute('aria-pressed', String(oscuro));
+    boton.title = oscuro ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+  });
 }
 
 function renderEncabezado() {

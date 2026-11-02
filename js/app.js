@@ -89,6 +89,12 @@ const ACCIONES = {
     document.querySelector('input[name="metodo"]:checked')?.focus();
   },
   descargar: descargarPoliza,
+  // Bonus modo oscuro: basecoat.theme guarda la elección en localStorage.
+  tema: () => {
+    if (window.basecoat?.theme) window.basecoat.theme.toggle();
+    else document.documentElement.classList.toggle('dark');
+    render();
+  },
   'mi-cuenta': () => mostrarToast({
     category: 'info',
     title: 'Mi cuenta',
