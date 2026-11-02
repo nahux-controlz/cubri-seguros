@@ -39,6 +39,7 @@
   </style>
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/app.css">
+  <script type="module" src="js/app.js"></script>
 </head>
 <body class="min-h-dvh bg-background text-foreground antialiased">
   <!-- Íconos (Lucide) reutilizados con <use href="#i-..."> -->
@@ -156,20 +157,20 @@
     </section>
 
     <!-- ============ Checkout (pasos 1 a 4) ============ -->
-    <div id="checkout" class="flex flex-col pb-44 lg:pb-16">
+    <div id="checkout" hidden class="flex flex-col pb-44 lg:pb-16">
       <!-- Barra mobile: Volver + título del paso -->
       <div class="sticky top-0 z-20 flex h-14 items-center gap-1 border-b border-border bg-card px-2 lg:hidden">
         <button type="button" class="btn text-foreground" data-variant="ghost" data-size="icon" data-accion="volver" aria-label="Volver al paso anterior">
           <svg class="size-5"><use href="#i-atras"/></svg>
         </button>
-        <p class="text-[1.0625rem] font-bold" data-bind="barra.titulo">Cotizá tu seguro</p>
+        <p class="text-[1.0625rem] font-bold" data-bind="barra.titulo"></p>
       </div>
 
       <div class="mx-auto flex w-full max-w-[1360px] flex-col lg:px-10">
         <!-- Encabezado del paso (desktop; en mobile solo en el paso 1) -->
         <header class="encabezado-paso order-2 px-5 pt-6 lg:order-1 lg:px-0 lg:pt-10">
           <p class="mb-1 hidden text-xs font-semibold text-primary lg:block">Seguro de Celular</p>
-          <h1 id="titulo-paso" tabindex="-1" class="text-2xl font-extrabold tracking-tight outline-none lg:text-[2rem]" data-bind="paso.titulo">Contanos sobre tu celular</h1>
+          <h1 id="titulo-paso" tabindex="-1" class="text-2xl font-extrabold tracking-tight outline-none lg:text-[2rem]" data-bind="paso.titulo"></h1>
         </header>
 
         <!-- Stepper: completo / activo / pendiente -->
@@ -198,7 +199,7 @@
           <div class="min-w-0">
 
             <!-- ============ 02 · Cotizar (Paso 1) ============ -->
-            <section data-paso="1" aria-labelledby="titulo-paso">
+            <section data-paso="1" hidden aria-labelledby="titulo-paso">
               <form id="form-cotizar" class="card checkout-form" novalidate>
                 <section class="grid gap-4 lg:grid-cols-2 lg:gap-x-5 lg:gap-y-5">
                   <div role="group" class="field" data-campo="marca">
@@ -241,13 +242,13 @@
                 <footer class="dock">
                   <button type="button" class="btn" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
                   <p id="ayuda-paso-1" class="text-center text-xs text-muted-foreground lg:ml-auto lg:text-right" hidden></p>
-                  <button type="submit" class="btn -order-1 lg:order-none" disabled data-bind="accion.1">Ver planes</button>
+                  <button type="submit" class="btn -order-1 lg:order-none" data-bind="accion.1"></button>
                 </footer>
               </form>
             </section>
 
             <!-- ============ 03 · Elegir plan (Paso 2) ============ -->
-            <section data-paso="2" aria-labelledby="titulo-paso">
+            <section data-paso="2" hidden aria-labelledby="titulo-paso">
               <form id="form-plan" class="card checkout-form" novalidate>
                 <section>
                   <fieldset>
@@ -276,7 +277,7 @@
                               <h3 class="plan-nombre">Plus</h3>
                               <span class="badge">Recomendado</span>
                             </div>
-                            <input type="radio" class="input" name="plan" value="plus" checked>
+                            <input type="radio" class="input" name="plan" value="plus">
                           </header>
                           <section>
                             <p class="plan-precio"><strong>$ 3.000</strong>/ mes</p>
@@ -310,13 +311,13 @@
 
                 <footer class="dock">
                   <button type="button" class="btn" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
-                  <button type="submit" class="btn lg:ml-auto" data-bind="accion.2">Continuar</button>
+                  <button type="submit" class="btn lg:ml-auto" data-bind="accion.2"></button>
                 </footer>
               </form>
             </section>
 
             <!-- ============ 04 · Datos personales (Paso 3) ============ -->
-            <section data-paso="3" aria-labelledby="titulo-paso">
+            <section data-paso="3" hidden aria-labelledby="titulo-paso">
               <form id="form-datos" class="card checkout-form" novalidate>
                 <section class="grid grid-cols-2 gap-x-3 gap-y-4 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-5">
                   <div role="group" class="field" data-campo="nombre">
@@ -361,17 +362,17 @@
                 <footer class="dock">
                   <button type="button" class="btn" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
                   <p id="ayuda-paso-3" class="text-center text-xs text-muted-foreground lg:ml-auto lg:text-right">El botón se habilita cuando el formulario es válido</p>
-                  <button type="submit" class="btn -order-1 lg:order-none" disabled data-bind="accion.3">Continuar al pago</button>
+                  <button type="submit" class="btn -order-1 lg:order-none" data-bind="accion.3"></button>
                 </footer>
               </form>
             </section>
 
             <!-- ============ 05 · Pago (Paso 4) ============ -->
-            <section data-paso="4" aria-labelledby="titulo-paso">
+            <section data-paso="4" hidden aria-labelledby="titulo-paso">
               <form id="form-pago" class="card checkout-form" novalidate>
                 <section class="grid gap-4 lg:gap-5">
                   <div role="radiogroup" class="field opciones-pago grid gap-3 lg:grid-cols-2" aria-label="Medio de pago">
-                    <label><input type="radio" class="input" name="metodo" value="credito" checked>Tarjeta de crédito</label>
+                    <label><input type="radio" class="input" name="metodo" value="credito">Tarjeta de crédito</label>
                     <label><input type="radio" class="input" name="metodo" value="debito">Tarjeta de débito</label>
                   </div>
 
@@ -408,7 +409,7 @@
                   <button type="button" class="btn" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
                   <button type="submit" id="boton-pagar" class="btn lg:ml-auto">
                     <svg class="hidden size-4 animate-spin" data-cargando aria-hidden="true"><use href="#i-cargando"/></svg>
-                    <span data-bind="accion.4">Pagar y contratar</span>
+                    <span data-bind="accion.4"></span>
                   </button>
                 </footer>
               </form>
@@ -424,28 +425,28 @@
               <dl class="resumen-filas">
                 <div data-fila="seguro">
                   <dt>Seguro</dt>
-                  <dd data-bind="resumen.seguro">Celular</dd>
+                  <dd data-bind="resumen.seguro"></dd>
                 </div>
                 <div data-fila="equipo">
                   <dt>Equipo</dt>
-                  <dd><span data-bind="resumen.equipo">Samsung Galaxy A55</span></dd>
+                  <dd><span data-bind="resumen.equipo"></span></dd>
                 </div>
                 <div data-fila="valor">
                   <dt>Valor</dt>
-                  <dd data-bind="resumen.valor">$ 600.000</dd>
+                  <dd data-bind="resumen.valor"></dd>
                 </div>
                 <div data-fila="plan">
                   <dt>Plan</dt>
-                  <dd><span data-bind="resumen.plan">Plus</span></dd>
+                  <dd><span data-bind="resumen.plan"></span></dd>
                 </div>
                 <div data-fila="titular">
                   <dt>Titular</dt>
-                  <dd><span data-bind="resumen.titular">Juan Pérez</span></dd>
+                  <dd><span data-bind="resumen.titular"></span></dd>
                 </div>
               </dl>
               <div class="resumen-total" data-fila="total">
                 <span>Total mensual</span>
-                <strong data-bind="resumen.total">$ 3.000</strong>
+                <strong data-bind="resumen.total"></strong>
               </div>
               <p class="resumen-nota" data-fila="nota">Completá los datos del equipo para ver el precio.</p>
             </section>
@@ -454,8 +455,8 @@
               Contratación 100% online · cancelá cuando quieras
             </footer>
             <div class="resumen-compacto">
-              <span data-bind="resumen.compacto">Plan Plus · Galaxy A55</span>
-              <strong><span data-bind="resumen.total">$ 3.000</span>/mes</strong>
+              <span data-bind="resumen.compacto"></span>
+              <strong><span data-bind="resumen.total"></span>/mes</strong>
             </div>
           </aside>
         </div>
@@ -463,20 +464,20 @@
     </div>
 
     <!-- ============ 06 · Éxito ============ -->
-    <section data-paso="5" aria-labelledby="titulo-exito" class="mx-auto flex w-full max-w-[600px] flex-col px-5 pt-16 pb-48 lg:pt-12 lg:pb-16">
+    <section data-paso="5" hidden aria-labelledby="titulo-exito" class="mx-auto flex w-full max-w-[600px] flex-col px-5 pt-16 pb-48 lg:pt-12 lg:pb-16">
       <div class="flex flex-col items-center gap-4 text-center lg:rounded-2xl lg:bg-card lg:px-10 lg:py-10 lg:shadow-xs lg:ring-1 lg:ring-foreground/10">
         <div class="icono-resultado" data-tipo="exito" aria-hidden="true"><svg><use href="#i-check"/></svg></div>
         <h1 id="titulo-exito" tabindex="-1" class="mt-2 text-[1.375rem] leading-snug font-extrabold tracking-tight outline-none">
-          <span class="block lg:inline">¡Listo, <span data-bind="exito.nombre">Juan</span>!</span>
+          <span class="block lg:inline">¡Listo, <span data-bind="exito.nombre"></span>!</span>
           Tu celular ya está protegido
         </h1>
-        <p class="text-[0.8125rem] text-muted-foreground">Te enviamos la póliza a <span data-bind="exito.email">juan.perez@mail.com</span></p>
-        <p class="poliza-numero"><span class="sr-only">Número de póliza: </span><span data-bind="exito.poliza">POL-2026-000123</span></p>
+        <p class="text-[0.8125rem] text-muted-foreground">Te enviamos la póliza a <span data-bind="exito.email"></span></p>
+        <p class="poliza-numero"><span class="sr-only">Número de póliza: </span><span data-bind="exito.poliza"></span></p>
         <dl class="detalle mt-2">
-          <div><dt>Plan</dt><dd data-bind="exito.plan">Plus</dd></div>
-          <div><dt>Equipo</dt><dd data-bind="exito.equipo">Samsung Galaxy A55</dd></div>
-          <div><dt>Vigencia desde</dt><dd data-bind="exito.vigencia">23/10/2026</dd></div>
-          <div><dt>Cuota mensual</dt><dd data-bind="exito.cuota">$ 3.000</dd></div>
+          <div><dt>Plan</dt><dd data-bind="exito.plan"></dd></div>
+          <div><dt>Equipo</dt><dd data-bind="exito.equipo"></dd></div>
+          <div><dt>Vigencia desde</dt><dd data-bind="exito.vigencia"></dd></div>
+          <div><dt>Cuota mensual</dt><dd data-bind="exito.cuota"></dd></div>
         </dl>
         <div class="dock mt-4 w-full lg:grid lg:grid-cols-2">
           <button type="button" class="btn w-full" data-accion="descargar">
@@ -489,14 +490,14 @@
     </section>
 
     <!-- ============ 07 · Error de pago ============ -->
-    <section data-paso="6" aria-labelledby="titulo-error" class="mx-auto flex w-full max-w-[600px] flex-col px-5 pt-16 pb-48 lg:pt-12 lg:pb-16">
+    <section data-paso="6" hidden aria-labelledby="titulo-error" class="mx-auto flex w-full max-w-[600px] flex-col px-5 pt-16 pb-48 lg:pt-12 lg:pb-16">
       <div class="flex flex-col items-center gap-4 text-center lg:rounded-2xl lg:bg-card lg:px-10 lg:py-10 lg:shadow-xs lg:ring-1 lg:ring-foreground/10">
         <div class="icono-resultado" data-tipo="error" aria-hidden="true"><svg><use href="#i-x"/></svg></div>
         <h1 id="titulo-error" tabindex="-1" class="mt-2 text-[1.375rem] leading-snug font-extrabold tracking-tight outline-none">No pudimos procesar el pago</h1>
         <p class="max-w-[26rem] text-[0.8125rem] text-muted-foreground">La tarjeta fue rechazada. Revisá los datos o probá con otro medio de pago. Tus datos quedaron guardados.</p>
         <div class="alert w-full text-left" data-variant="destructive">
           <svg aria-hidden="true"><use href="#i-alerta"/></svg>
-          <h2 data-bind="error.motivo">Tarjeta rechazada</h2>
+          <h2 data-bind="error.motivo"></h2>
           <section class="text-xs">Tarjeta de prueba que fuerza el error: 4000 0000 0000 0002</section>
         </div>
         <div class="dock mt-4 w-full lg:grid lg:grid-cols-2">
