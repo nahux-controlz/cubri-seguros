@@ -240,8 +240,8 @@
                 </section>
 
                 <footer class="dock">
-                  <button type="button" class="btn" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
-                  <p id="ayuda-paso-1" class="text-center text-xs text-muted-foreground lg:ml-auto lg:text-right" hidden></p>
+                  <button type="button" class="btn lg:mr-auto" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
+                  <p id="ayuda-paso-1" class="text-center text-xs text-muted-foreground lg:text-right" hidden></p>
                   <button type="submit" class="btn -order-1 lg:order-none" data-bind="accion.1"></button>
                 </footer>
               </form>
@@ -288,8 +288,8 @@
                 </section>
 
                 <footer class="dock">
-                  <button type="button" class="btn" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
-                  <button type="submit" class="btn lg:ml-auto" data-bind="accion.2"></button>
+                  <button type="button" class="btn lg:mr-auto" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
+                  <button type="submit" class="btn" data-bind="accion.2"></button>
                 </footer>
               </form>
             </section>
@@ -338,8 +338,8 @@
                 </section>
 
                 <footer class="dock">
-                  <button type="button" class="btn" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
-                  <p id="ayuda-paso-3" class="text-center text-xs text-muted-foreground lg:ml-auto lg:text-right">El botón se habilita cuando el formulario es válido</p>
+                  <button type="button" class="btn lg:mr-auto" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
+                  <p id="ayuda-paso-3" class="text-center text-xs text-muted-foreground lg:text-right">El botón se habilita cuando el formulario es válido</p>
                   <button type="submit" class="btn -order-1 lg:order-none" data-bind="accion.3"></button>
                 </footer>
               </form>
@@ -384,8 +384,8 @@
                 </section>
 
                 <footer class="dock">
-                  <button type="button" class="btn" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
-                  <button type="submit" id="boton-pagar" class="btn lg:ml-auto">
+                  <button type="button" class="btn lg:mr-auto" data-variant="outline" data-solo="desktop" data-accion="volver">Volver</button>
+                  <button type="submit" id="boton-pagar" class="btn">
                     <svg class="hidden size-4 animate-spin" data-cargando aria-hidden="true"><use href="#i-cargando"/></svg>
                     <span data-bind="accion.4"></span>
                   </button>
@@ -476,7 +476,7 @@
         <div class="alert w-full text-left" data-variant="destructive">
           <svg aria-hidden="true"><use href="#i-alerta"/></svg>
           <h2 data-bind="error.motivo"></h2>
-          <section class="text-xs">Tarjeta terminada en <span data-bind="error.tarjeta"></span>. La tarjeta de prueba que fuerza el error es 4000 0000 0000 0002.</section>
+          <section class="text-xs"><p>Tarjeta terminada en <span data-bind="error.tarjeta"></span>. La tarjeta de prueba que fuerza el error es 4000 0000 0000 0002.</p></section>
         </div>
         <div class="dock mt-4 w-full lg:grid lg:grid-cols-2">
           <button type="button" class="btn w-full" data-accion="reintentar">Reintentar pago</button>
